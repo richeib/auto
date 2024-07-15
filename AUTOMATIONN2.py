@@ -32,7 +32,9 @@ def fetch_and_save_data():
         
         df = pd.DataFrame({
             'Product Name': product_name,
-            'Price': price
+            'Price': price,
+            'url': URL
+            
         })
         df.to_csv('Product.csv', index=False)
         
@@ -43,6 +45,7 @@ def fetch_and_save_data():
         return None
 
 def upload_to_database(df):
+    
     if df is None:
         print("No data to upload.")
         return
@@ -62,12 +65,14 @@ def upload_to_database(df):
         CREATE TABLE IF NOT EXISTS PRODUCT_TABLE (
             ID INT AUTO_INCREMENT PRIMARY KEY,
             PRODUCT_NAME VARCHAR(255),
-            PRICE DECIMAL(10, 2),prd_table VARCHAR(255)
+            PRICE DECIMAL(10, 2),
+            url TEXT,
+            prd_table BOOLEAN
         )
         """)
 
         # Insert values into the table
-        query = "INSERT INTO PRODUCT_TABLE (PRODUCT_NAME, PRICE) VALUES (%s, %s)"
+        query = "INSERT INTO PRODUCT_TABLE (PRODUCT_NAME, PRICE ,url) VALUES (%s, %s,%s)"
         values = list(df.itertuples(index=False, name=None))
         
         cursor.executemany(query, values)
@@ -77,7 +82,7 @@ def upload_to_database(df):
     
     except mysql.connector.Error as e:
         print(f"Database error: {e}")
-    
+
     finally:
         if mydb.is_connected():
             cursor.close()
